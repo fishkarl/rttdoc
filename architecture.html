@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agora Real-time Translation Architecture Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #0080FF;
+            border-bottom: 2px solid #0080FF;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #0080FF;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #444;
+            margin-top: 20px;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+        }
+        .flow-diagram {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0080FF;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffca28;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .api-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .system-diagram {
+            text-align: center;
+            margin: 25px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .diagram-caption {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agora Real-time Translation Architecture Documentation</h1>
+    
+    <h2>Overview</h2>
+    <p>This document describes how to implement real-time voice translation functionality based on the Agora SDK. This feature allows users speaking different languages to communicate without barriers, as the system automatically detects the user's language and translates voice content into the target language displayed as subtitles.</p>
+    
+    <div class="system-diagram">
+        <img src="images/time_sq.png" alt="Agora Real-time Translation Flow Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
+        <p class="diagram-caption">图 1: Agora实时翻译系统流程图</p>
+    </div>
+    
+    <h2>Prerequisites</h2>
+    <ul>
+        <li>Registered Agora developer account</li>
+        <li>Created Agora project and obtained App ID</li>
+        <li>Integrated Agora RTC and RTM SDK into your application</li>
+        <li>Turn on Agora STT service from Agora console</li>
+    </ul>
+    
+    <h2>System Architecture</h2>
+    <p>The system consists of the following main components:</p>
+    <ul>
+        <li><strong>User Client</strong>: Application with integrated Agora SDK</li>
+        <li><strong>Demo Server</strong>: Handles authentication and token generation</li>
+        <li><strong>RTC</strong>: Agora Real-time Communication service, responsible for audio stream transmission</li>
+        <li><strong>RTM</strong>: Agora Real-time Messaging service, responsible for messages and translation results transmission</li>
+        <li><strong>Agent</strong>: Translation agent, responsible for speech recognition and translation processing</li>
+    </ul>
+    
+    <h2>Workflow</h2>
+    
+    <h3>1. Initialization Process</h3>
+    <div class="flow-diagram">
+        <pre>User Client → Demo Server: Request token (with uid)
+Demo Server → User Client: Return token</pre>
+    </div>
+    <p>When the application starts, the client needs to request tokens for RTC and RTM connections from the server.</p>
+    
+    <h3>2. Login Process</h3>
+    <div class="flow-diagram">
+        <pre>User Client → RTC: Login to RTC using token, enable stream message monitoring
+User Client → RTM: Login to RTM using token</pre>
+    </div>
+    <p>Use the tokens obtained from the server to log in to both RTC and RTM services.</p>
+    
+    <h3>3. Language Synchronization and Agent Startup</h3>
+    <div class="flow-diagram">
+        <pre>RTC → User Client: Get remote users' source languages, deduplicate and set as local target languages
+User Client → RTC: Call Join API (configure local language settings and enable STT service)
+RTC → Agent: Call Join API (forward language settings)
+Agent → User Client: Start worker process to subscribe to application audio streams and enable translation
+RTC → User Client: Startup successful
+User Client → RTM: Synchronize local language settings to RTM user status</pre>
+    </div>
+    <p>At this stage, the system detects user languages, configures speech recognition and translation services, and synchronizes language settings.</p>
+    
+    <h3>4. Remote User Status Change Handling</h3>
+    <div class="flow-diagram">
+        <pre>RTC → User Client: Remote user join/status change notification
+RTC → User Client: Get remote users' source languages, deduplicate and set as local target languages
+User Client → RTC: Call Update API (update target language settings)
+RTC → Agent: Call Update API (update language configuration)
+Agent → User Client: Update worker process language settings from previous agent startup process
+RTC → User Client: Update successful</pre>
+    </div>
+    <p>When new users join or existing users' status changes, the system re-detects languages and updates translation configurations.</p>
+    
+    <h3>5. Real-time Translation Process</h3>
+    <div class="flow-diagram">
+        <pre>User Client → RTC: Listen for stream messages
+RTC → Agent: Push translation results to channel-wide stream messages
+Agent → User Client: Receive stream messages and display subtitles</pre>
+    </div>
+    <p>This is the actual translation workflow where users' speech is recognized, translated, and then displayed as subtitles to other users.</p>
+    
+    <h2>API Interface Description</h2>
+    
+    <h3>Initialization and Authentication</h3>
+    <div class="api-section">
+        <h4>Request Token API</h4>
+        <ul>
+            <li><strong>Function</strong>: Obtain tokens for RTC and RTM connections</li>
+            <li><strong>Parameters</strong>: User ID (uid)</li>
+            <li><strong>Returns</strong>: Authorization token</li>
+        </ul>
+    </div>
+    
+    <h3>RTC Related Interfaces</h3>
+    <div class="api-section">
+        <h4>Join API</h4>
+        <ul>
+            <li><strong>Function</strong>: Configure local language settings and enable Speech-to-Text (STT) service</li>
+            <li><strong>Parameters</strong>: Language settings, STT service configuration</li>
+        </ul>
+        
+        <h4>Update API</h4>
+        <ul>
+            <li><strong>Function</strong>: Update target language settings</li>
+            <li><strong>Parameters</strong>: Target language configuration</li>
+        </ul>
+    </div>
+    
+    <h3>Agent Related Interfaces</h3>
+    <div class="api-section">
+        <h4>Join API</h4>
+        <ul>
+            <li><strong>Function</strong>: Forward language settings to translation agent</li>
+            <li><strong>Parameters</strong>: Language configuration information</li>
+        </ul>
+        
+        <h4>Update API</h4>
+        <ul>
+            <li><strong>Function</strong>: Update language configuration</li>
+            <li><strong>Parameters</strong>: Updated language configuration</li>
+        </ul>
+        
+        <h4>Start Worker API</h4>
+        <ul>
+            <li><strong>Function</strong>: Start worker process to subscribe to audio streams and enable translation</li>
+            <li><strong>Parameters</strong>: Application audio stream configuration</li>
+        </ul>
+    </div>
+    
+    <h2>Implementation Steps</h2>
+    
+    <h3>1. Server-side Setup</h3>
+    <ul>
+        <li>Implement token generation API</li>
+        <li>Configure language detection and translation services</li>
+    </ul>
+    
+    <h3>2. Client Integration</h3>
+    <ul>
+        <li>Integrate Agora RTC and RTM SDK</li>
+        <li>Implement token request and login processes</li>
+        <li>Configure language settings and synchronization mechanisms</li>
+        <li>Implement subtitle display interface</li>
+    </ul>
+    
+    <h3>3. Translation Agent Configuration</h3>
+    <ul>
+        <li>Set up speech recognition service</li>
+        <li>Configure translation engine</li>
+        <li>Implement real-time stream processing</li>
+    </ul>
+    
+    <h2>Subscription Relationship Model</h2>
+    <div class="system-diagram">
+        <img src="images/sub_relationship.png" alt="Subscription Relationship Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
+        <p class="diagram-caption">Figure 2: Subscription Relationship Between Components</p>
+    </div>
+    <p>The diagram above illustrates the subscription relationship between different components in the Agora real-time translation system:</p>
+    <ul>
+        <li><strong>User Clients</strong>: Each user client subscribes to audio streams from other clients and translation results from the Agent.</li>
+        <li><strong>Translation Agent</strong>: Each Agent subscribes to specific audio stream which in the channel to perform speech recognition and translation.</li>
+        <li><strong>Data Flow</strong>: Audio streams flow through RTC while translation results are distributed via RTM to ensure efficient delivery.</li>
+        <li><strong>Scalability</strong>: This architecture allows for seamless scaling as more users join the channel, with the Agent handling the increased translation load.</li>
+    </ul>
+    <p>This subscription model ensures that each component receives only the data it needs to process, optimizing bandwidth usage and system performance. The Agent acts as a central translation hub, while keeping the communication paths between users direct and efficient.</p>
+    
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Pre-configure language settings before users join channels</li>
+        <li>Use caching mechanisms to reduce the frequency of language detection and configuration</li>
+        <li>Implement error handling and retry mechanisms to improve stability</li>
+        <li>Provide options for users to manually select languages in case automatic detection is inaccurate</li>
+        <li>Refer to our <a href="webdemostruct.html">Web Demo</a> for implementation examples and best practices</li>
+        <li>Check our <a href="#">Server Demo</a> for server-side implementation guidelines</li>
+    </ul>
+    
+    <h2>API Documentation</h2>
+    <p>For detailed information about the RESTful APIs used in the real-time translation system, please refer to our comprehensive <a href="asrv3.html">Voice to Text RESTful API Documentation</a>. The documentation covers:</p>
+    <ul>
+        <li>API endpoints for starting, querying, and stopping voice-to-text tasks</li>
+        <li>Request and response formats with detailed parameter descriptions</li>
+        <li>Configuration options for different translation modes</li>
+        <li>Storage and recording capabilities</li>
+        <li>Best practices for API integration</li>
+    </ul>
+    
+    <div class="note" style="background-color: #e6f7ff; border-left-color: #0080FF;">
+        <h3>TIPS</h3>
+        <p>We recommend assigning a dedicated worker for each end user to better recognize and translate conversations. <strong style="background-color: #ffeb3b; padding: 2px 4px;">Each worker should only recognize one language</strong>. You can configure this using the following field:</p>
+        <pre style="background-color: #f8f9fa; border-left: 3px solid #0080FF;">
+"uidLanguagesConfig": [                        // Optional: Configure specific languages for individual users
+     {
+        "uid": "&lt;YouSpecifyUid&gt;",              // User ID to configure language for
+        "languages": ["&lt;YourTranscribeLanguages&gt;"] // Languages to use for this specific user
+     }
+  ]</pre>
+    </div>
+    
+    <h2>Important Notes</h2>
+    <div class="note">
+        <ul>
+            <li>Ensure sufficient permissions to access user microphones</li>
+            <li>We suggest to use dedicated worker for each user, so users can speak simultaneously</li>
+            <li>Demo server play a manager role, it should control worker life cycle.</li>
+        </ul>
+    </div>
+    
+    <p>By following the guidelines in this document, you can successfully integrate Agora's real-time voice translation functionality into your application, providing users with barrier-free communication experience across different languages.</p>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #666; font-size: 14px; border-top: 1px solid #eee; padding-top: 20px;">
+        © 2025 Agora Real-time Translation Architecture Documentation
+    </footer>
+</body>
+</html>

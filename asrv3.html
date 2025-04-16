@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice to Text RESTful API V3 Documentation【7-x】【New Version, Recommended⭐️】</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #0080FF;
+      border-bottom: 2px solid #0080FF;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #0080FF;
+      margin-top: 30px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    h3 {
+      color: #444;
+      margin-top: 20px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+    }
+    code {
+      background-color: #f5f5f5;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    blockquote {
+      border-left: 4px solid #ccc;
+      margin-left: 0;
+      padding-left: 15px;
+      color: #666;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .diagram {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .note {
+      background-color: #fffde7;
+      border-left: 4px solid #ffeb3b;
+      padding: 10px 15px;
+      margin: 15px 0;
+    }
+    .comment {
+      color: #008000;
+      font-style: italic;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .code-with-comments {
+      position: relative;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+      line-height: 1.5;
+    }
+    .code-with-comments .comment {
+      display: inline-block;
+      margin-left: 10px;
+    }
+    /* 添加API URL高亮样式 */
+    .api-url {
+      background-color: #e6f7ff;
+      border: 1px solid #1890ff;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #0066cc;
+      display: inline-block;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Voice to Text RESTful API V3 Documentation</h1>
+  <p class="note">Version 7.x | New Version, Recommended⭐️</p>
+
+  <div class="section-container">
+    <h2>1. Overview</h2>
+
+  <p>This document provides an overview of Agora's Voice to Text RESTful API. You can send HTTP requests from your business server to Agora's server to perform voice-to-text conversion on the server side. This product supports four modes:</p>
+
+  <ol>
+    <li>Real-time Captions: Only performs real-time voice-to-text functionality.</li>
+    <li>Real-time Captions + Recording Captions: Based on real-time voice-to-text functionality, supports storing and playback of recognized text and video.</li>
+    <li>Real-time Captions + Translation Captions: Based on real-time voice-to-text functionality, supports translating the recognized content, for example, real-time recognition of Chinese and translating it to English, then pushing both Chinese and English captions back to RTC.</li>
+    <li>Real-time Captions + Recording Captions + Translation Captions: Based on real-time voice-to-text functionality, supports storing and playback of recognized text and video, while also supporting translation of recognized content, for example, real-time recognition of Chinese and translating it to English, then pushing both Chinese and English captions back to RTC.</li>
+  </ol>
+
+  <h2>1.1 Call Steps</h2>
+
+  <p>The steps for voice-to-text conversion are as follows:</p>
+
+  <ol>
+    <li>Start a voice-to-text task through a <code>join</code> request.</li>
+    <li>After completion, call <code>leave</code> to stop the voice-to-text task.</li>
+  </ol>
+
+  <p>After starting voice-to-text conversion, you can also query the status of the voice-to-text task through a <code>query</code> request.</p>
+
+  <h2>1.2 API Call Diagram</h2>
+
+  <div class="diagram">
+    <h3>API Call Flow Diagram</h3>
+    <svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+      <!-- Client -->
+      <rect x="50" y="50" width="100" height="50" fill="#e6f7ff" stroke="#1890ff" />
+      <text x="100" y="80" text-anchor="middle">App Server</text>
+      
+      <!-- Agora Server -->
+      <rect x="450" y="50" width="100" height="50" fill="#e6f7ff" stroke="#1890ff" />
+      <text x="500" y="80" text-anchor="middle">Agora Server</text>
+      
+      <!-- Vertical Lines -->
+      <line x1="100" y1="100" x2="100" y2="250" stroke="#d9d9d9" stroke-dasharray="5,5" />
+      <line x1="500" y1="100" x2="500" y2="250" stroke="#d9d9d9" stroke-dasharray="5,5" />
+      
+      <!-- join -->
+      <line x1="100" y1="130" x2="500" y2="130" stroke="#1890ff" marker-end="url(#arrowhead)" />
+      <text x="300" y="125" text-anchor="middle">join</text>
+      
+      <!-- response -->
+      <line x1="500" y1="150" x2="100" y2="150" stroke="#1890ff" marker-end="url(#arrowhead)" />
+      <text x="300" y="145" text-anchor="middle">response (taskId)</text>
+      
+      <!-- query (optional) -->
+      <line x1="100" y1="180" x2="500" y2="180" stroke="#1890ff" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+      <text x="300" y="175" text-anchor="middle">query (optional)</text>
+      
+      <!-- leave -->
+      <line x1="100" y1="210" x2="500" y2="210" stroke="#1890ff" marker-end="url(#arrowhead)" />
+      <text x="300" y="205" text-anchor="middle">leave</text>
+      
+      <!-- Arrowhead definition -->
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#1890ff" />
+        </marker>
+      </defs>
+    </svg>
+    <p class="note">Note: This diagram illustrates the typical flow of API calls between the App server and Agora server for voice-to-text service.</p>
+  </div>
+
+  <h2>1.3 Limitations</h2>
+
+  <p>The voice-to-text business is undergoing rapid iteration. If you encounter any issues during use, please contact service personnel directly to quickly identify the problem.</p>
+
+  <h2>1.4 Additional Notes</h2>
+
+  <p>The current version supports int type uid, but for future expansion to string type uid, the uid input in the Body is of string type, and will be automatically converted to int internally. In the future, 'enable_string_uid' will be added to allow users to choose the uid type.</p>
+
+  <h2>2. Quick Start</h2>
+
+  <p>Overall configuration parameter description:</p>
+
+  <ul>
+    <li>gateway address is the gateway address provided by Agora.</li>
+    <li>appId is the App ID of your Agora project created on <a href="https://console.agora.io/">Agora Console</a>.</li>
+    <li>taskId is the value of the taskId field returned after a successful start call by the business.</li>
+  </ul>
+
+  <h2>2.1 join</h2>
+  <h3>2.1.1 URL</h3>
+  <p class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/join</p>
+
+  <p>// trans-ai-agent</p>
+
+  <p>Note: The HTTP method for join call is POST.</p>
+
+  <h3>2.1.2 Body</h3>
+
+  <ul>
+    <li>Request Body example and field explanation
+      <div class="code-with-comments">
+<pre>{
+  "languages": [                                  <span class="comment">// Array of language codes for transcription, e.g., "en-US", "zh-CN"</span>
+      "&lt;YourTranscribeLanguages&gt;"
+  ],
+  "name": "xxxx",                                 <span class="comment">// Task name for identification purposes</span>
+  "uidLanguagesConfig": [                        <span class="comment">// Optional: Configure specific languages for individual users</span>
+     {
+        "uid": "&lt;YouSpecifyUid&gt;",              <span class="comment">// User ID to configure language for</span>
+        "languages": ["&lt;YourTranscribeLanguages&gt;"] <span class="comment">// Languages to use for this specific user</span>
+     }
+  ],
+  "maxIdleTime": 50,                             <span class="comment">// Maximum idle time in seconds before auto-termination</span>
+  "rtcConfig": {                                 <span class="comment">// RTC configuration settings</span>
+      "channelName": "&lt;YourChannelName&gt;",       <span class="comment">// Name of the RTC channel to join</span>
+      "subBotUid": "&lt;YourSubscribeUid&gt;",        <span class="comment">// UID for the bot that subscribes to audio</span>
+      "subBotToken": "&lt;YourSubscribeToken&gt;",    <span class="comment">// Token for the subscribing bot (optional)</span>
+      "pubBotUid": "&lt;YourPublishUid&gt;",          <span class="comment">// UID for the bot that publishes captions</span>
+      "pubBotToken": "&lt;YourPublishToken&gt;",      <span class="comment">// Token for the publishing bot (optional)</span>
+      "cryptionMode": &lt;YourDecryptionMode&gt;,     <span class="comment">// Encryption mode if channel is encrypted</span>
+      "secret": "&lt;YourSecret&gt;",                 <span class="comment">// Secret key for encryption</span>
+      "salt": "&lt;YourSalt&gt;",                     <span class="comment">// Salt value for encryption</span>
+      "subscribeAudioUids": ["&lt;YourSubscribeAudioUids&gt;"],     <span class="comment">// Specific UIDs to subscribe to</span>
+      "unSubscribeAudioUids": ["&lt;YourUnSubscribeAudioUids&gt;"], <span class="comment">// UIDs to exclude from subscription</span>
+      "enableJsonProtocol": bool                 <span class="comment">// Whether to enable JSON protocol</span>
+  },
+  "captionConfig": {                             <span class="comment">// Configuration for caption recording</span>
+      "sliceDuration": 60,                       <span class="comment">// Duration of each caption slice in seconds</span>
+      "storage": {                               <span class="comment">// Storage configuration for saving captions</span>
+          "accessKey": "&lt;YourOssAccessKey&gt;",    <span class="comment">// Access key for the storage service</span>
+          "secretKey": "&lt;YourOssSecretKey&gt;",    <span class="comment">// Secret key for the storage service</span>
+          "bucket": "&lt;YourOssBucketName&gt;",      <span class="comment">// Bucket name for storing files</span>
+          "vendor": &lt;YourOssVendor&gt;,            <span class="comment">// Storage vendor ID (e.g., 1=AWS, 2=Aliyun)</span>
+          "region": &lt;YourOssRegion&gt;,            <span class="comment">// Storage region code</span>
+          "fileNamePrefix": ["&lt;YourOssPrefix&gt;"]  <span class="comment">// Prefix for stored file names</span>
+      }
+  },
+  "translateConfig": {                           <span class="comment">// Configuration for translation service</span>
+      "languages": [                             <span class="comment">// Array of translation language pairs</span>
+          {
+              "source": "&lt;SourceLanguage&gt;",      <span class="comment">// Source language code (e.g., "zh-CN")</span>
+              "target": ["&lt;TargetLanguage&gt;"]     <span class="comment">// Array of target language codes (e.g., ["en-US", "ja-JP"])</span>
+          }
+      ]
+  },
+  "extensionParams": {                           <span class="comment">// Optional extension parameters</span>
+      "&lt;YourSessCtrlCfgName&gt;": "&lt;YourSessCtrCfgValue&gt;"  <span class="comment">// Custom configuration parameters</span>
+  }
+}</pre>
+      </div>
+      <div class="note">
+        <p><strong>Note:</strong></p>
+        <p>&lt;YourTranscribeLanguages&gt;, &lt;YourChannelName&gt;, &lt;YourSubscribeUid&gt;, &lt;YourSubscribeToken&gt;, &lt;YourPublishUid&gt;, &lt;YourPublishToken&gt;, &lt;YourToken&gt;, &lt;YourChannelType&gt;, &lt;YourOssAccessKey&gt;, &lt;YourOssSecretKey&gt;, &lt;YourOssBucketName&gt;, &lt;YourOssVendor&gt;, &lt;YourOssRegion&gt;, &lt;YourOssPrefix&gt; etc. are fields that need to be replaced during testing.</p>
+      </div>
+      
+      <h4>Parameter Description:</h4>
+      
+      <h5>uidLanguagesConfig Single Element Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>uid</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>User ID to specify language for</td>
+        </tr>
+        <tr>
+          <td>languages</td>
+          <td>array</td>
+          <td>Yes</td>
+          <td>Array of language codes for transcription</td>
+        </tr>
+      </table>
+      
+      <h5>rtcConfig Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>channelName</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Name of the RTC channel</td>
+        </tr>
+        <tr>
+          <td>subBotUid</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>User ID for the subscription bot</td>
+        </tr>
+        <tr>
+          <td>subBotToken</td>
+          <td>string</td>
+          <td>No</td>
+          <td>Token for the subscription bot</td>
+        </tr>
+        <tr>
+          <td>pubBotUid</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>User ID for the publishing bot</td>
+        </tr>
+        <tr>
+          <td>pubBotToken</td>
+          <td>string</td>
+          <td>No</td>
+          <td>Token for the publishing bot</td>
+        </tr>
+        <tr>
+          <td>cryptionMode</td>
+          <td>integer</td>
+          <td>No</td>
+          <td>Encryption mode</td>
+        </tr>
+        <tr>
+          <td>secret</td>
+          <td>string</td>
+          <td>No</td>
+          <td>Secret for encryption</td>
+        </tr>
+        <tr>
+          <td>salt</td>
+          <td>string</td>
+          <td>No</td>
+          <td>Salt for encryption</td>
+        </tr>
+        <tr>
+          <td>subscribeAudioUids</td>
+          <td>array</td>
+          <td>No</td>
+          <td>List of user IDs to subscribe to</td>
+        </tr>
+        <tr>
+          <td>unSubscribeAudioUids</td>
+          <td>array</td>
+          <td>No</td>
+          <td>List of user IDs to unsubscribe from</td>
+        </tr>
+        <tr>
+          <td>enableJsonProtocol</td>
+          <td>boolean</td>
+          <td>No</td>
+          <td>Whether to enable JSON protocol</td>
+        </tr>
+      </table>
+      
+      <h5>captionConfig Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>sliceDuration</td>
+          <td>integer</td>
+          <td>Yes</td>
+          <td>Duration of each caption slice in seconds</td>
+        </tr>
+        <tr>
+          <td>storage</td>
+          <td>object</td>
+          <td>Yes</td>
+          <td>Storage configuration for captions</td>
+        </tr>
+      </table>
+      
+      <h5>storage Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>accessKey</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Access key for the storage service</td>
+        </tr>
+        <tr>
+          <td>secretKey</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Secret key for the storage service</td>
+        </tr>
+        <tr>
+          <td>bucket</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Bucket name for storage</td>
+        </tr>
+        <tr>
+          <td>vendor</td>
+          <td>integer</td>
+          <td>Yes</td>
+          <td>Storage vendor identifier (e.g., 1=AWS, 2=Aliyun)</td>
+        </tr>
+        <tr>
+          <td>region</td>
+          <td>integer</td>
+          <td>Yes</td>
+          <td>Storage region identifier</td>
+        </tr>
+        <tr>
+          <td>fileNamePrefix</td>
+          <td>array</td>
+          <td>No</td>
+          <td>Prefix for stored files</td>
+        </tr>
+      </table>
+      
+      <h5>translateConfig Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>languages</td>
+          <td>array</td>
+          <td>Yes</td>
+          <td>Array of language translation configurations</td>
+        </tr>
+        <tr>
+          <td>enable</td>
+          <td>boolean</td>
+          <td>No</td>
+          <td>Whether to enable translation</td>
+        </tr>
+      </table>
+      
+      <h5>languages Type Definition</h5>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>source</td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Source language code</td>
+        </tr>
+        <tr>
+          <td>target</td>
+          <td>array</td>
+          <td>Yes</td>
+          <td>Array of target language codes</td>
+        </tr>
+      </table>
+      
+      <h4>Below is a body example using Real-time Captions + Recording Captions + Translation Captions, which can be used after replacing fields as needed:</h4>
+      <div class="code-with-comments">
+<pre>{
+  "languages": [                                <span class="comment">// Set Chinese as the default transcription language</span>
+      "zh-CN"
+  ],
+  "name": "agora-test",                         <span class="comment">// Task name for identification</span>
+  "maxIdleTime": 50,                            <span class="comment">// Terminate after 50 seconds of inactivity</span>
+  "rtcConfig": {                                <span class="comment">// RTC connection configuration</span>
+      "channelName": "agora-test",              <span class="comment">// Channel name to join</span>
+      "subBotUid": "47091",                     <span class="comment">// Bot UID that subscribes to audio</span>
+      "pubBotUid": "88222"                      <span class="comment">// Bot UID that publishes captions</span>
+  },
+  "translateConfig": {                          <span class="comment">// Translation configuration</span>
+      "languages": [                            <span class="comment">// Define language translation pairs</span>
+          {
+              "source": "zh-CN",                <span class="comment">// Source language: Chinese</span>
+              "target": [                       <span class="comment">// Target languages for translation</span>
+                  "en-US",                      <span class="comment">// English (US)</span>
+                  "ar-SA",                      <span class="comment">// Arabic (Saudi Arabia)</span>
+                  "id-ID",                      <span class="comment">// Indonesian</span>
+                  "fr-FR",                      <span class="comment">// French</span>
+                  "ja-JP"                       <span class="comment">// Japanese</span>
+              ]
+          }
+      ]
+  },
+  "captionConfig": {                            <span class="comment">// Caption recording configuration</span>
+      "sliceDuration": 60,                      <span class="comment">// Each recording slice is 60 seconds</span>
+      "storage": {                              <span class="comment">// Storage configuration</span>
+          "accessKey": "test-oss",              <span class="comment">// Storage access key</span>
+          "secretKey": "test-oss",              <span class="comment">// Storage secret key</span>
+          "bucket": "test-oss",                 <span class="comment">// Storage bucket name</span>
+          "vendor": 2,                          <span class="comment">// Storage vendor (2 = Aliyun OSS)</span>
+          "region": 3                           <span class="comment">// Storage region code</span>
+      }
+  }
+}</pre>
+      </div>
+    </li>
+    <li>Response Body
+      <ul>
+        <li>Success
+          <pre>
+{
+ "agent_id": "String",     <span class="comment">// Unique identifier for the created task</span>
+ "create_ts": int,         <span class="comment">// Timestamp when the task was created</span>
+ "status": enum(STATUS)    <span class="comment">// Current status of the task</span>
+}
+          </pre>
+          <p>StatusCode: 200</p>
+          <table>
+            <tr>
+              <th>Status Value</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>RUNNING</td>
+              <td>The task is currently running</td>
+            </tr>
+            <tr>
+              <td>STOPPED</td>
+              <td>The task has been stopped</td>
+            </tr>
+            <tr>
+              <td>FAILED</td>
+              <td>The task has failed</td>
+            </tr>
+          </table>
+        </li>
+        <li>Failure
+          <p>StatusCode: not 200</p>
+          <pre>
+{
+ "detail": string,   <span class="comment">// Detailed error message</span>
+ "reason": string    <span class="comment">// Error reason code</span>
+}
+          </pre>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>2.2 Get</h2>
+  <h3>2.2.1 URL</h3>
+
+  <p>Note: The HTTP method for get call is GET.</p>
+  <p class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/agents/{agentId}</p>
+
+  <h3>2.2.2 Body</h3>
+
+  <ul>
+    <li><strong>Request body — None</strong></li>
+    <li><strong>Response body</strong>
+      <pre>
+{
+  "message": "ok",                                  <span class="comment">// Status message</span>
+  "create_ts": 1735035893,                         <span class="comment">// Timestamp when the task was created</span>
+  "status": "RUNNING",                             <span class="comment">// Current status: task is running</span>
+  "agent_id": "1NT29X11GQSINF1ECVGZNU80BEIN56XF"   <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+      <pre>
+{
+  "message": "ok",                                  <span class="comment">// Status message</span>
+  "create_ts": 1735035893,                         <span class="comment">// Timestamp when the task was created</span>
+  "status": "STOPPED",                             <span class="comment">// Current status: task is stopped</span>
+  "agent_id": "1NT29X11GQSINF1ECVGZNU80BEIN56XF"   <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+      <pre>
+{
+  "message": "agent exits with reason: idle too long",  <span class="comment">// Reason for task termination</span>
+  "create_ts": 1735035893,                             <span class="comment">// Timestamp when the task was created</span>
+  "status": "STOPPED",                                 <span class="comment">// Current status: task is stopped</span>
+  "agent_id": "1NT29X11GQSINF1ECVGZNU80BEIN56XF"       <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+      <pre>
+{
+  "message": "agent exits with reason: xxxx",          <span class="comment">// Error message</span>
+  "create_ts": 1735035893,                            <span class="comment">// Timestamp when the task was created</span>
+  "status": "FAILED",                                 <span class="comment">// Current status: task failed</span>
+  "agent_id": "1NT29X11GQSINF1ECVGZNU80BEIN56XF"      <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+    </li>
+  </ul>
+
+  <h2>2.3 leave</h2>
+  <h3>2.3.1 URL</h3>
+
+  <p>Note: The HTTP method for leave call is POST.</p>
+  <p class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/agents/{agentId}/leave</p>
+
+  <h3>2.3.2 Body</h3>
+
+  <ul>
+    <li>Request Body — None</li>
+    <li>Response Body — Success
+      <pre>
+{
+  "message": "ok",                                  <span class="comment">// Status message indicating successful termination</span>
+  "create_ts": 1735035893,                         <span class="comment">// Timestamp when the task was created</span>
+  "status": "STOPPED",                             <span class="comment">// Current status: task is now stopped</span>
+  "agent_id": "1NT29X11GQSINF1ECVGZNU80BEIN56XF"   <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+    </li>
+    <li>Response Body — Failure
+      <pre>
+{
+ "detail": string,   <span class="comment">// Detailed error message</span>
+ "reason": string    <span class="comment">// Error reason code</span>
+}
+      </pre>
+    </li>
+  </ul>
+
+  <h2>2.4 update</h2>
+  <h3>2.4.1 URL</h3>
+
+  <p>Note: The HTTP method for update call is POST.</p>
+  <p class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/agents/{agentId}/update</p>
+  <h3>2.4.2 Body</h3>
+
+  <ul>
+    <li>Request Body
+      <div class="code-with-comments">
+<pre>{
+  "languages": [                                 <span class="comment">// Update the transcription languages</span>
+      "&lt;YourTranscribeLanguages&gt;"
+  ],
+  "uidLanguagesConfig": [                        <span class="comment">// Update language settings for specific users</span>
+     {
+        "uid": "&lt;YouSpecifyUid&gt;",              <span class="comment">// User ID to update settings for</span>
+        "languages": ["&lt;YourTranscribeLanguages&gt;"] <span class="comment">// New languages for this user</span>
+     }
+  ],
+  "rtcConfig": {                                  <span class="comment">// Update RTC configuration</span>
+      "subscribeAudioUids": ["123"]              <span class="comment">// New list of UIDs to subscribe to</span>
+  },
+  "translateConfig": {                            <span class="comment">// Update translation settings</span>
+  "enable": true,                            <span class="comment">// Enable/disable translation</span>
+  "languages": [                             <span class="comment">// Update translation language pairs</span>
+      {
+          "source": "&lt;SourceLanguage&gt;",      <span class="comment">// Source language code</span>
+          "target": ["&lt;TargetLanguage&gt;"]     <span class="comment">// Target language codes</span>
+      }
+  ]
+}
+}</pre>
+  </div>
+  <p><strong>Parameter Description:</strong></p>
+  <ul>
+    <li><strong>Path: &sequenceId=1&updateMask=languages</strong></li>
+    <li><strong>Body:</strong> supported fields</li>
+  </ul>
+  <table>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>languages</td>
+      <td>Update the transcription languages</td>
+    </tr>
+    <tr>
+      <td>uidLanguagesConfig</td>
+      <td>Update the language configuration for specific UIDs</td>
+    </tr>
+    <tr>
+      <td>rtcConfig.subscribeAudioUids</td>
+      <td>Update the list of UIDs to subscribe to</td>
+    </tr>
+    <tr>
+      <td>translateConfig</td>
+      <td>Update the translation configuration</td>
+    </tr>
+  </table>
+</li>
+<li>Response Body
+  <ul>
+    <li>Success:
+      <pre>
+{
+"create_ts": 1719813325,                      <span class="comment">// Timestamp when the task was created</span>
+"status": "RUNNING",                          <span class="comment">// Current status: task is running</span>
+"agent_id": "a7217cb2cb41c160545887a11235e75d" <span class="comment">// Unique task identifier</span>
+}
+      </pre>
+    </li>
+    <li>Failure:
+      <pre>
+{
+"detail": string,   <span class="comment">// Detailed error message</span>
+"reason": string    <span class="comment">// Error reason code</span>
+}
+      </pre>
+    </li>
+  </ul>
+</li>
+</ul>
+
+
+</body>
+</html>
