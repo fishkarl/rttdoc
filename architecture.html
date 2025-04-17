@@ -80,9 +80,55 @@
     <p>This document describes how to implement real-time voice translation functionality based on the Agora SDK. This feature allows users speaking different languages to communicate without barriers, as the system automatically detects the user's language and translates voice content into the target language displayed as subtitles.</p>
     
     <div class="system-diagram">
-        <img src="images/time_sq.png" alt="Agora Real-time Translation Flow Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
+        <img src="https://kroki.io/mermaid/svg/eNq9VE1v2zAMvedX8NgCNXbPIUCRoluBZhhid3dVZhxusuRJVILu14-aP2K7Sbte5ptsvke-x2cF_BXRarwjVXlVLxrlmTQ1yjLcNs3kfIe1gxz9Af3k_bZYz86byfm7I41w-7CQ56tjBCcMif2m_7KEB0tMytBvxeQsfPNOYwgLKcpWq1HjJWzTxIGhcD_RwtWReA-RyuvFqCoTkEBTMUdv29p5cxlzCY-uonk70dN_YJfUwVUMZKuW5hrQqmeDENijqrNagKpCqJ1IcF7qBprNhGYzpbnsxaOyVUyUOTILIICyJeQvVu-9NGktWgjhIPMzMniRL3wxCF9w0QuZ6YhuoMQyNoa0kopEFgSgAhinlQFWvpJzX33O9LWzO6qixw7S1yai04idMXlRyHt_ED2TpaxWJ433zh-VL_-dqIdm89FyGZ9jAyHqtMNdNGeTcKZstKaTuZcVdktsDWZx8vIG8_jMxKKgC1ba-r1xx3PW5iiCZysYmn7cvzf-sW2bkKckQOzgGGC9FzzCFzHdpOSOQ7UdBeqHI_sptBjdYqxj2qVE_fcwPjVlgn7Ysw43AHQX6lbCxYB1sHfy9brqjT0okzHVCIVXNpj2yhvyMdxAFBj_3h3Tm0bMXo-WpJEOry6jZGtJoTHqRUZqwxj-AHS3ER8" alt="Agora Real-time Translation Flow Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
         <p class="diagram-caption">Figure 1: Agora Real-time Translation System Flow Diagram</p>
     </div>
+
+    <div class="system-diagram">
+        <div class="mermaid">
+sequenceDiagram
+    participant User1 as User 1 (English)
+    participant User2 as User 2 (Chinese)
+    participant Client as Client App
+    participant Server as Demo Server
+    participant RTC as Agora RTC
+    participant Agent as Translation Agent
+    
+    User1->>Client: Speak in English
+    Client->>Server: Request token
+    Server->>Client: Return token
+    Client->>RTC: Login with token
+    Client->>RTC: Stream audio
+    RTC->>Agent: Forward audio stream
+    Agent->>Agent: Speech-to-Text (English)
+    Agent->>Agent: Translate (English to Chinese)
+    Agent->>RTC: Send translated text
+    RTC->>Client: Deliver translated text
+    Client->>User2: Display Chinese subtitles
+    
+    User2->>Client: Speak in Chinese
+    Client->>RTC: Stream audio
+    RTC->>Agent: Forward audio stream
+    Agent->>Agent: Speech-to-Text (Chinese)
+    Agent->>Agent: Translate (Chinese to English)
+    Agent->>RTC: Send translated text
+    RTC->>Client: Deliver translated text
+    Client->>User1: Display English subtitles
+        </div>
+        <p class="diagram-caption">Figure 2: Agora Real-time Translation audio Flow Diagram</p>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                securityLevel: 'loose',
+            });
+        });
+    </script>
+
     
     <h2>Prerequisites</h2>
     <ul>
