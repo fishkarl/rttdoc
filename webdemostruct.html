@@ -3,29 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agora RTT Demo Project Structure</title>
+  <title>Agora RTT Demo Project Documentation</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       line-height: 1.6;
       color: #333;
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 20px;
     }
-    h1, h2, h3 {
-      color: #0052cc;
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 20px;
     }
     h1 {
-      border-bottom: 2px solid #0052cc;
-      padding-bottom: 10px;
+      color: #0052cc;
     }
     h2 {
+      color: #0052cc;
       margin-top: 30px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 5px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 10px;
     }
     h3 {
+      color: #0052cc;
       margin-top: 25px;
     }
     pre {
@@ -35,319 +39,224 @@
       overflow-x: auto;
     }
     code {
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Courier New', monospace;
     }
-    .file-structure {
-      font-family: 'Courier New', Courier, monospace;
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-radius: 5px;
-      white-space: pre-wrap;
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
     }
-    .component {
-      background-color: #f0f7ff;
-      padding: 10px;
-      border-left: 4px solid #0052cc;
-      margin-bottom: 15px;
+    .section {
+      flex: 1;
+      min-width: 300px;
     }
-    .note {
-      background-color: #fff8e6;
-      padding: 10px;
-      border-left: 4px solid #ffab00;
-      margin: 15px 0;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .highlight {
+      background-color: #e6f7ff;
+      border-left: 4px solid #1890ff;
+      padding: 10px 15px;
       margin: 20px 0;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
     }
     .flow-diagram {
-      text-align: center;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
       margin: 20px 0;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>Agora RTT Demo Project Structure</h1>
-  
-  <div class="note">
-    <strong>Note:</strong> This documentation is based on the <a href="https://github.com/AgoraIO-Community/Agora-RTT-Demo/tree/feat/nsus/web" target="_blank">Agora-RTT-Demo</a> repository, specifically the <code>feat/nsus/web</code> branch.
+  <header>
+    <h1>Agora RTT Demo Project Documentation</h1>
+    <p>Real-Time Translation demonstration application based on Agora SDK, supporting speech-to-text and real-time text translation functions</p>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <h2>Project Overview</h2>
+      <p>Agora RTT (Real-Time Translation) Demo is a real-time translation demonstration application based on Agora SDK, supporting speech-to-text and real-time text translation functions. The project is built using React + TypeScript, with Redux for state management and Ant Design as the UI component library.</p>
+
+      <div class="highlight">
+        <strong>Core Features:</strong>
+        <ul>
+          <li>Real-time audio and video communication</li>
+          <li>Speech-to-Text (STT)</li>
+          <li>Real-time text translation</li>
+          <li>Multi-language support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Technology Stack</h2>
+      <ul>
+        <li><strong>Frontend Framework:</strong> React + TypeScript</li>
+        <li><strong>State Management:</strong> Redux/Redux Toolkit</li>
+        <li><strong>UI Components:</strong> Ant Design</li>
+        <li><strong>Real-time Communication:</strong> Agora SDK (agora-rtc-sdk-ng, agora-rtm)</li>
+        <li><strong>Internationalization:</strong> i18next</li>
+        <li><strong>Data Serialization:</strong> Protobuf</li>
+        <li><strong>Build Tool:</strong> Vite</li>
+      </ul>
+    </div>
   </div>
+
+  <h2>Project Structure</h2>
+  <pre><code>Agora-RTT-Demo/
+├── .cert/                 // Certificate directory
+├── .git/                  // Git version control
+├── web/                   // Frontend application directory
+│   ├── public/            // Public resources
+│   ├── src/               // Source code
+│   │   ├── assets/        // Static resources
+│   │   ├── common/        // Common utilities and functions
+│   │   ├── components/    // UI components
+│   │   ├── i18n/          // Internationalization configuration
+│   │   ├── manager/       // Business logic managers
+│   │   ├── pages/         // Page components
+│   │   ├── protobuf/      // Protobuf message definitions
+│   │   ├── router/        // Router configuration
+│   │   ├── store/         // Redux state management
+│   │   ├── styles/        // Style files
+│   │   ├── types/         // TypeScript type definitions
+│   │   ├── App.tsx        // Main application component
+│   │   └── main.tsx       // Entry file
+│   ├── package.json       // Dependency management
+│   └── vite.config.ts     // Vite configuration
+└── .gitignore             // Git ignore configuration</code></pre>
+
+  <h2>Core Module Analysis</h2>
   
-  <h2>1. Project Overview</h2>
-  <p>Agora RTT (Real-Time Transcription) Demo is a sample project showcasing real-time speech-to-text functionality, built on Agora's real-time communication technology. The project implements features such as real-time speech transcription, multi-language support, and real-time translation.</p>
-  
-  <h2>2. Technology Stack</h2>
-  <ul>
-    <li><strong>Frontend Framework:</strong> React.js</li>
-    <li><strong>UI Components:</strong> Material-UI</li>
-    <li><strong>State Management:</strong> React Context API</li>
-    <li><strong>Real-time Communication:</strong> Agora RTC SDK</li>
-    <li><strong>Real-time Transcription:</strong> Agora RTT SDK</li>
-    <li><strong>Build Tool:</strong> Webpack</li>
-  </ul>
-  
-  <h2>3. Directory Structure</h2>
-  
-  <div class="file-structure">
-web/
-├── public/                 # Static resources directory
-│   ├── index.html          # HTML template
-│   └── assets/             # Images and other static assets
-│
-├── src/                    # Source code directory
-│   ├── components/         # React components
-│   │   ├── AudioDeviceSelector.jsx  # Audio device selection component
-│   │   ├── LanguageSelector.jsx     # Language selection component
-│   │   ├── RTTComponent.jsx         # Core RTT functionality component
-│   │   ├── TranscriptDisplay.jsx    # Transcription results display component
-│   │   └── ...
-│   │
-│   ├── contexts/           # React Contexts
-│   │   ├── RTTContext.js   # RTT-related state management
-│   │   └── ...
-│   │
-│   ├── services/           # Service layer
-│   │   ├── agoraRTCService.js  # Agora RTC service
-│   │   ├── agoraRTTService.js  # Agora RTT service
-│   │   └── ...
-│   │
-│   ├── utils/              # Utility functions
-│   │   ├── languageUtils.js    # Language-related utilities
-│   │   ├── tokenUtils.js       # Token generation utilities
-│   │   └── ...
-│   │
-│   ├── config.js           # Configuration file
-│   ├── App.jsx             # Main application component
-│   └── index.jsx           # Entry file
-│
-├── .babelrc                # Babel configuration
-├── .eslintrc               # ESLint configuration
-├── package.json            # Project dependencies
-├── webpack.config.js       # Webpack configuration
-└── README.md               # Project documentation
+  <div class="container">
+    <div class="section">
+      <h3>Entry Files</h3>
+      <ul>
+        <li><strong>web/src/main.tsx</strong>: Application entry point, configuring Redux, Ant Design theme, and i18n internationalization</li>
+        <li><strong>web/src/App.tsx</strong>: Main application component, containing the router container</li>
+      </ul>
+
+      <h3>Router Structure</h3>
+      <ul>
+        <li><strong>web/src/router/index.tsx</strong>: Defines application routes, including home page, login page, and 404 page</li>
+      </ul>
+
+      <h3>State Management</h3>
+      <ul>
+        <li><strong>web/src/store/index.ts</strong>: Redux store configuration, using Redux Toolkit</li>
+        <li><strong>web/src/store/reducers/global.ts</strong>: Global state handling, containing user information, subtitle data, language settings, and other states</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h3>Business Logic Managers</h3>
+      <ul>
+        <li><strong>web/src/manager/rtc/</strong>: Agora real-time communication management</li>
+        <li><strong>web/src/manager/rtm/</strong>: Real-time messaging management</li>
+        <li><strong>web/src/manager/stt/</strong>: Speech recognition and conversion module</li>
+        <li><strong>web/src/manager/parser/</strong>: Data parsing module</li>
+      </ul>
+
+      <h3>Main Components</h3>
+      <ul>
+        <li><strong>web/src/components/header/</strong>: Header component</li>
+        <li><strong>web/src/components/footer/</strong>: Footer control bar component</li>
+        <li><strong>web/src/components/caption/</strong>: Subtitle display component</li>
+        <li><strong>web/src/components/dialog/</strong>: Dialog component</li>
+        <li><strong>web/src/components/user-list/</strong>: User list component</li>
+        <li><strong>web/src/components/menu/</strong>: Menu component</li>
+        <li><strong>web/src/components/stream-player/</strong>: Media stream player component</li>
+      </ul>
+
+      <h3>Page Components</h3>
+      <ul>
+        <li><strong>web/src/pages/home/</strong>: Home page</li>
+        <li><strong>web/src/pages/login/</strong>: Login page</li>
+        <li><strong>web/src/pages/404/</strong>: 404 error page</li>
+      </ul>
+    </div>
   </div>
-  
-  <h2>4. Core Components</h2>
-  
-  <div class="component">
-    <h3>RTTComponent.jsx</h3>
-    <p>The core component for RTT functionality, responsible for initializing Agora RTC and RTT services, handling audio input, and transcription output.</p>
-    <p><strong>Main Functions:</strong></p>
-    <ul>
-      <li>Initialize and manage Agora clients</li>
-      <li>Handle audio device selection</li>
-      <li>Start and stop transcription services</li>
-      <li>Process transcription results</li>
-    </ul>
-  </div>
-  
-  <div class="component">
-    <h3>TranscriptDisplay.jsx</h3>
-    <p>Component responsible for displaying real-time transcription results.</p>
-    <p><strong>Main Functions:</strong></p>
-    <ul>
-      <li>Display original transcription text</li>
-      <li>Show translation results (if enabled)</li>
-      <li>Handle display formatting for different languages</li>
-      <li>Support text copying and exporting</li>
-    </ul>
-  </div>
-  
-  <div class="component">
-    <h3>LanguageSelector.jsx</h3>
-    <p>Language selection component that allows users to select source language and target translation language.</p>
-    <p><strong>Main Functions:</strong></p>
-    <ul>
-      <li>Provide list of supported languages</li>
-      <li>Handle language switching events</li>
-      <li>Update RTT service language settings</li>
-    </ul>
-  </div>
-  
-  <h2>5. Service Layer</h2>
-  
-  <div class="component">
-    <h3>agoraRTCService.js</h3>
-    <p>Service layer encapsulating the Agora RTC SDK, handling real-time audio communication.</p>
-    <p><strong>Main Functions:</strong></p>
-    <ul>
-      <li>Initialize RTC client</li>
-      <li>Join/leave channel</li>
-      <li>Audio device management</li>
-      <li>Volume control</li>
-    </ul>
-  </div>
-  
-  <div class="component">
-    <h3>agoraRTTService.js</h3>
-    <p>Service layer encapsulating Agora RTT functionality, handling real-time transcription.</p>
-    <p><strong>Main Functions:</strong></p>
-    <ul>
-      <li>Initialize RTT service</li>
-      <li>Configure transcription parameters</li>
-      <li>Handle transcription result callbacks</li>
-      <li>Manage transcription state</li>
-      <li>Process translation requests</li>
-    </ul>
-  </div>
-  
-  <h2>6. Data Flow</h2>
+
+  <h2>Frontend Data Flow</h2>
   
   <div class="flow-diagram">
-    <svg width="620" height="300" xmlns="http://www.w3.org/2000/svg">
-      <!-- Token Controller -->
-      <rect x="0" y="0" width="120" height="60" fill="#d5e8d4" stroke="#82b366" />
-      <text x="60" y="35" text-anchor="middle">Token Controller</text>
-      
-      <!-- Agora RTC SDK -->
-      <rect x="250" y="0" width="120" height="60" fill="#ffe6cc" stroke="#d79b00" />
-      <text x="310" y="25" text-anchor="middle">Agora RTC SDK</text>
-      <text x="310" y="45" text-anchor="middle">(Audio Connection)</text>
-      
-      <!-- Agora RTT SDK -->
-      <rect x="500" y="0" width="120" height="60" fill="#dae8fc" stroke="#6c8ebf" />
-      <text x="560" y="25" text-anchor="middle">Agora RTT SDK</text>
-      <text x="560" y="45" text-anchor="middle">(Transcription)</text>
-      
-      <!-- RTT Component -->
-      <rect x="250" y="120" width="120" height="60" fill="#f8cecc" stroke="#b85450" />
-      <text x="310" y="150" text-anchor="middle">RTT Component</text>
-      
-      <!-- Transcript Display -->
-      <rect x="250" y="240" width="120" height="60" fill="#e1d5e7" stroke="#9673a6" />
-      <text x="310" y="270" text-anchor="middle">Transcript Display</text>
-      
-      <!-- Arrows -->
-      <!-- Token to RTC -->
-      <line x1="120" y1="30" x2="250" y2="30" stroke="#000" stroke-width="2" />
-      <polygon points="245,25 250,30 245,35" fill="#000" />
-      
-      <!-- RTC to RTT -->
-      <line x1="370" y1="30" x2="500" y2="30" stroke="#000" stroke-width="2" />
-      <polygon points="495,25 500,30 495,35" fill="#000" />
-      
-      <!-- RTC to Component -->
-      <line x1="310" y1="60" x2="310" y2="120" stroke="#000" stroke-width="2" />
-      <polygon points="305,115 310,120 315,115" fill="#000" />
-      
-      <!-- RTT to Component -->
-      <line x1="560" y1="60" x2="310" y2="120" stroke="#000" stroke-width="2" />
-      <polygon points="307,115 310,120 313,115" fill="#000" />
-      
-      <!-- Component to Display -->
-      <line x1="310" y1="180" x2="310" y2="240" stroke="#000" stroke-width="2" />
-      <polygon points="305,235 310,240 315,235" fill="#000" />
-    </svg>
+    <h3>User Login Process</h3>
+    <ol>
+      <li>User enters information on the login page</li>
+      <li>Data is submitted to the store through Redux actions</li>
+      <li>Data is stored in Redux's global.userInfo</li>
+      <li>Simultaneously saved to local storage through setUserInfoToLocal</li>
+    </ol>
+
+    <h3>Real-time Audio and Video Communication</h3>
+    <ol>
+      <li>The manager/rtc module handles interaction with the Agora RTC SDK</li>
+      <li>Audio and video states are updated to the store through Redux actions</li>
+      <li>Components retrieve states from Redux and render accordingly</li>
+    </ol>
+
+    <h3>Speech-to-Text and Translation Process</h3>
+    <ol>
+      <li>Voice input is processed by the manager/stt module</li>
+      <li>Speech recognition results are updated to the store through Redux actions (such as pushSubtitles)</li>
+      <li>The subtitle component reads sttSubtitles data from the store and displays it</li>
+    </ol>
+
+    <h3>User Interaction and UI State Management</h3>
+    <ol>
+      <li>User interactions trigger Redux actions</li>
+      <li>Actions update states in the store (such as menuList, memberListShow, etc.)</li>
+      <li>Components respond to state changes and re-render</li>
+    </ol>
   </div>
-  
-  <h2>7. Key Workflows</h2>
-  
-  <h3>7.1 Initialization Flow</h3>
-  <ol>
-    <li>The application starts and loads configuration from <code>config.js</code></li>
-    <li>Token Controller generates necessary tokens for Agora services</li>
-    <li>RTT Component initializes the Agora RTC client</li>
-    <li>Audio devices are enumerated and set up</li>
-    <li>RTT service is initialized with selected language parameters</li>
-  </ol>
-  
-  <h3>7.2 Transcription Flow</h3>
-  <ol>
-    <li>User starts transcription through UI</li>
-    <li>RTT Component activates audio capture</li>
-    <li>Audio data is sent to Agora RTC SDK</li>
-    <li>Agora RTT SDK processes the audio and returns transcription</li>
-    <li>Transcription results are processed and formatted</li>
-    <li>Results are displayed in the TranscriptDisplay component</li>
-  </ol>
-  
-  <h3>7.3 Translation Flow</h3>
-  <ol>
-    <li>User selects target language for translation</li>
-    <li>Original transcription is sent to translation service</li>
-    <li>Translation results are returned</li>
-    <li>Both original and translated text are displayed in parallel</li>
-  </ol>
-  
-  <h2>8. Configuration</h2>
-  
-  <p>The application requires the following configuration parameters in <code>config.js</code>:</p>
-  
-  <table>
-    <tr>
-      <th>Parameter</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td>AGORA_APP_ID</td>
-      <td>Agora application ID from Agora Console</td>
-    </tr>
-    <tr>
-      <td>AGORA_TOKEN</td>
-      <td>Token for authentication (or token generation parameters)</td>
-    </tr>
-    <tr>
-      <td>DEFAULT_CHANNEL</td>
-      <td>Default channel name for RTC connection</td>
-    </tr>
-    <tr>
-      <td>DEFAULT_SOURCE_LANGUAGE</td>
-      <td>Default language for transcription</td>
-    </tr>
-    <tr>
-      <td>SUPPORTED_LANGUAGES</td>
-      <td>Array of supported languages for transcription and translation</td>
-    </tr>
-  </table>
-  
-  <h2>9. Getting Started</h2>
-  
-  <h3>9.1 Prerequisites</h3>
+
+  <h2>Core Redux State</h2>
+  <pre><code>// Global state structure
+export interface InitialState {
+// STT related data
+sttData: ISttData
+
+// User state
+userInfo: IUserInfo
+options: IOptions
+localVideoMute: boolean
+localAudioMute: boolean
+captionLanguages: string[]
+languageSelect: ILanguageSelect
+recordLanguageSelect: { translate1List?: string[], translate2List?: string[] }
+sttSubtitles: ITextItem[]
+
+// Remote user state
+currentSpeaker: number
+remoteUserList: Map<number, IUserInfo>
+
+// UI state
+languageSettingShow: boolean
+memberListShow: boolean
+dialogRecordShow: boolean
+captionShow: boolean
+aiShow: boolean
+tipSTTEnable: boolean
+menuList: MenuType[]
+page: { width: number, height: number }
+isUpdating: boolean
+messageList: IMessage[]
+}</code></pre>
+
+  <h2>Development and Build Commands</h2>
   <ul>
-    <li>Node.js (v14 or higher)</li>
-    <li>npm or yarn</li>
-    <li>Agora account with App ID and valid token</li>
+    <li><code>yarn dev</code>: Start development environment</li>
+    <li><code>yarn build</code>: Build for production environment</li>
+    <li><code>yarn lint</code>: Code checking</li>
+    <li><code>yarn prettier</code>: Code formatting</li>
   </ul>
-  
-  <h3>9.2 Installation</h3>
-  <pre>
-# Clone the repository
-git clone https://github.com/AgoraIO-Community/Agora-RTT-Demo.git
-cd Agora-RTT-Demo/web
 
-# Install dependencies
-npm install
-
-# Configure the application
-# Create a config.js file based on config.example.js
-# Add your Agora App ID and token
-
-# Start the development server
-npm start
-  </pre>
-  
-  <h2>10. Customization Points</h2>
-  
-  <p>The application provides several customization points:</p>
-  
-  <ul>
-    <li><strong>Language Support:</strong> Add or modify supported languages in the language utilities</li>
-    <li><strong>UI Customization:</strong> Modify Material-UI themes and component styles</li>
-    <li><strong>Transcription Display:</strong> Customize how transcriptions are formatted and displayed</li>
-    <li><strong>Audio Processing:</strong> Adjust audio capture and processing parameters</li>
-  </ul>
-  
-  <div class="note">
-    <strong>Development Note:</strong> When extending this project, it's recommended to follow the established architecture pattern of separating UI components from service layers to maintain clean separation of concerns.
+  <div class="footer">
+    <p>Project Repository: <a href="https://github.com/AgoraIO-Community/Agora-RTT-Demo/tree/release/7.x/web" target="_blank">https://github.com/AgoraIO-Community/Agora-RTT-Demo/tree/release/7.x/web</a></p>
   </div>
 </body>
 </html>
