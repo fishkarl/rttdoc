@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agora RTT Demo Server Documentation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 20px;
+    }
+    h1 {
+      color: #0052cc;
+    }
+    h2 {
+      color: #0052cc;
+      margin-top: 30px;
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 10px;
+    }
+    h3 {
+      color: #0052cc;
+      margin-top: 25px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .section {
+      flex: 1;
+      min-width: 300px;
+    }
+    .highlight {
+      background-color: #e6f7ff;
+      border-left: 4px solid #1890ff;
+      padding: 10px 15px;
+      margin: 20px 0;
+    }
+    .flow-diagram {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    .mermaid-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+      });
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Agora RTT Demo Server Documentation</h1>
+    <p>Server integration with Agora's Real-Time Translation (RTT) service, providing speech-to-text and AI translation capabilities</p>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <h2>Project Overview</h2>
+      <p>Agora RTT Demo Server is a demonstration project that showcases the integration of Agora's Real-Time Translation (RTT) service, providing speech-to-text and AI translation capabilities. The project is built using Go, offering RESTful API endpoints and supporting Cross-Origin Resource Sharing (CORS).</p>
+
+      <div class="highlight">
+        <strong>Core Features:</strong>
+        <ul>
+          <li>Real-time speech-to-text conversion</li>
+          <li>AI-powered translation</li>
+          <li>RESTful API endpoints</li>
+          <li>Configurable logging</li>
+          <li>Cross-Origin Resource Sharing (CORS) support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Technology Stack</h2>
+      <ul>
+        <li><strong>Programming Language:</strong> Go 1.20+</li>
+        <li><strong>Build Tool:</strong> Make</li>
+        <li><strong>Configuration Management:</strong> TOML</li>
+        <li><strong>API Style:</strong> RESTful</li>
+        <li><strong>Third-party Service:</strong> Agora RTT Service</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>System Workflow</h2>
+  <div class="mermaid-container">
+    <div class="mermaid">
+sequenceDiagram
+    participant Client
+    participant Server
+    participant Agora RTT Service
+    
+    %% Join Session Flow
+    Client->>Server: POST /v1/speech-to-text/projects/:appId/join
+    Server->>Agora RTT Service: Authenticate & Create Agent
+    Agora RTT Service-->>Server: Agent Created (agentId)
+    Server-->>Client: Return agentId &
+    
+    %% Translation Flow
+    rect rgb(200, 220, 250)
+        Note over Client,Agora RTT Service: Real-time Translation Process
+        Client->>Agora RTT Service: Stream Audio
+        Agora RTT Service->>Agora RTT Service: Speech-to-Text
+        Agora RTT Service->>Agora RTT Service: Text Translation
+        Agora RTT Service-->>Client: Return Translated Text
+    end
+    
+    %% Update Settings Flow
+    Client->>Server: POST /v1/speech-to-text/projects/:appId/agents/:agentId/update
+    Server->>Agora RTT Service: Update Agent Settings
+    Agora RTT Service-->>Server: Settings Updated
+    Server-->>Client: Success Response
+    
+    %% Leave Session Flow
+    Client->>Server: POST /v1/speech-to-text/projects/:appId/agents/:agentId/leave 
+    Server->>Agora RTT Service: End Agent
+    Agora RTT Service-->>Server: Agent Ended
+    Server-->>Client: Success Response
+    </div>
+  </div>
+
+  <h2>Project Structure</h2>
+  <pre><code>Agora-RTT-Demo-Server/
+├── backend/
+│   ├── cmd/            # Application entry points
+│   ├── configs/        # Configuration files
+│   ├── internal/       # Internal packages
+│   ├── vendor/         # Dependencies
+│   ├── Makefile        # Build scripts
+│   ├── go.mod          # Go modules file
+│   └── go.sum          # Go modules checksum
+└── LICENSE             # License file</code></pre>
+
+  <h2>Core Module Analysis</h2>
+  
+  <div class="container">
+    <div class="section">
+      <h3>Configuration Management</h3>
+      <p>The server uses TOML configuration files to manage various settings:</p>
+      <ul>
+        <li><strong>Log Configuration:</strong> Controls logging behavior, including file paths, log levels, and output modes</li>
+        <li><strong>HTTP Server Configuration:</strong> Defines server port and other HTTP-related settings</li>
+        <li><strong>Agora RTT Service Configuration:</strong> Contains API endpoints and authentication details</li>
+      </ul>
+
+      <h3>API Endpoints</h3>
+      <p>The server exposes several RESTful endpoints for interacting with the Agora RTT service:</p>
+      <ul>
+        <li><strong>Join Endpoint:</strong> Creates a new speech-to-text agent</li>
+        <li><strong>Leave Endpoint:</strong> Terminates an existing agent</li>
+        <li><strong>Update Endpoint:</strong> Modifies agent settings</li>
+        <li><strong>Info Endpoint:</strong> Retrieves agent information</li>
+        <li><strong>Health Check:</strong> Monitors server status</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h3>Error Handling</h3>
+      <p>The server implements comprehensive error handling:</p>
+      <ul>
+        <li>Structured logging of all errors</li>
+        <li>Appropriate HTTP status codes for different error types</li>
+        <li>Consistent error response format</li>
+      </ul>
+
+      <h3>Security Features</h3>
+      <p>Security is a key consideration in the server design:</p>
+      <ul>
+        <li>CORS configuration for controlled cross-origin access</li>
+        <li>Authentication using Agora credentials</li>
+        <li>HTTPS support for production deployments</li>
+        <li>Input validation to prevent injection attacks</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Configuration Details</h2>
+  
+  <div class="flow-diagram">
+    <h3>Configuration File Structure</h3>
+    <pre><code>[log]
+fileName = "/data/logs/server.log"  # Log file path
+level = "INFO"                      # Log level (DEBUG, INFO, WARN, ERROR)
+maxSize = 10                        # Max log file size in MB
+mode = 0                            # Log mode (0: console, 1: file, 2: both)
+
+[httpServer]
+port = 8084                         # HTTP server port
+
+[transAIServiceConfig]
+baseURL = "https://api.agora.io"    # Agora API base URL
+
+[transAIAppIdConfigs.your_app_id]
+appCert = "&lt;your_app_certificate&gt;"  # Your Agora app certificate
+appId = "&lt;your_app_id&gt;"             # Your Agora app ID
+authPassword = "&lt;your_auth_password&gt;" # Console Customer Secret
+authUsername = "&lt;your_auth_username&gt;" # Console Customer Key</code></pre>
+  </div>
+
+  <h2>API Endpoint Details</h2>
+  
+  <div class="flow-diagram">
+    <h3>Speech-to-Text Endpoints</h3>
+    <ul>
+      <li><code>POST /v1/speech-to-text/projects/:appId/join</code>
+        <p>Creates a new speech-to-text agent for the specified application.</p>
+      </li>
+      <li><code>POST /v1/speech-to-text/projects/:appId/agents/:agentId/leave</code>
+        <p>Terminates an existing speech-to-text agent.</p>
+      </li>
+      <li><code>POST /v1/speech-to-text/projects/:appId/agents/:agentId/update</code>
+        <p>Updates the settings of an existing speech-to-text agent.</p>
+      </li>
+      <li><code>POST /v1/speech-to-text/projects/:appId/agents/:agentId</code>
+        <p>Retrieves information about an existing speech-to-text agent.</p>
+      </li>
+    </ul>
+
+    <h3>Health Check Endpoint</h3>
+    <ul>
+      <li><code>GET /healthz</code>
+        <p>Returns the current status of the server. Used for monitoring and load balancing.</p>
+      </li>
+    </ul>
+  </div>
+
+  <h2>Development and Build Commands</h2>
+  <ul>
+    <li><code>make build</code>: Builds the server application</li>
+    <li><code>make run</code>: Runs the server on port 8084</li>
+    <li><code>make test</code>: Runs the test suite</li>
+    <li><code>make clean</code>: Cleans build artifacts</li>
+  </ul>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li>Go 1.20 or higher</li>
+    <li>Make (for building)</li>
+    <li>Agora account and credentials</li>
+  </ul>
+
+  <div class="footer">
+    <p>This project is licensed under the terms found in the LICENSE file.</p>
+    <p>Project Repository: <a href="https://github.com/AgoraIO-Community/Agora-RTT-Demo/tree/release/7.x/backend" target="_blank">https://github.com/AgoraIO-Community/Agora-RTT-Demo/tree/release/7.x/backend</a></p>
+  </div>
+</body>
+</html>
