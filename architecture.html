@@ -160,21 +160,6 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
         </ul>
     </div>
     
-    <h3>RTC Related Interfaces</h3>
-    <div class="api-section">
-        <h4>Join API</h4>
-        <ul>
-            <li><strong>Function</strong>: Configure local language settings and enable Speech-to-Text (STT) service</li>
-            <li><strong>Parameters</strong>: Language settings, STT service configuration</li>
-        </ul>
-        
-        <h4>Update API</h4>
-        <ul>
-            <li><strong>Function</strong>: Update target language settings</li>
-            <li><strong>Parameters</strong>: Target language configuration</li>
-        </ul>
-    </div>
-    
     <h3>Agent Related Interfaces</h3>
     <div class="api-section">
         <h4>Join API</h4>
@@ -189,10 +174,10 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
             <li><strong>Parameters</strong>: Updated language configuration</li>
         </ul>
         
-        <h4>Start Worker API</h4>
+        <h4>Leave API</h4>
         <ul>
-            <li><strong>Function</strong>: Start worker process to subscribe to audio streams and enable translation</li>
-            <li><strong>Parameters</strong>: Application audio stream configuration</li>
+            <li><strong>Function</strong>: Let worker leave channel and stop transcription and translation</li>
+            <li><strong>Parameters</strong>: None</li>
         </ul>
     </div>
     
@@ -263,6 +248,37 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
         "languages": ["&lt;YourTranscribeLanguages&gt;"] // Languages to use for this specific user
      }
   ]</pre>
+    
+        <p>Here's a complete example of an actual request:</p>
+        <pre style="background-color: #f8f9fa; border-left: 3px solid #0080FF;">
+{
+  "name": "**",
+  "languages": ["en-US"],
+  "maxIdleTime": 30,
+  "rtcConfig": {
+    "channelName": "22",
+    "subBotUid": "*",
+    "pubBotUid": "****",
+    "subscribeAudioUids": ["144757"],
+    "subBotToken": "*****",
+    "pubBotToken": "*****"
+  },
+  <strong style="background-color: #ffeb3b; display: inline-block; width: 100%;">"uidLanguagesConfig": [
+    {
+      "uid": "*",
+      "languages": ["en-US"]
+    }
+  ],</strong>
+  "translateConfig": {
+    "languages": [
+      {
+        "source": "en-US",
+        "target": ["zh-CN"]
+      }
+    ]
+  }
+}</pre>
+        <p>In this example, we've configured a dedicated worker to recognize English (en-US) for a specific user, and translate it to Chinese (zh-CN).</p>
     </div>
     
     <h2>Important Notes</h2>
