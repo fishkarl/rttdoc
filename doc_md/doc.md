@@ -72,8 +72,6 @@ Agora-RTT-Demo/
 - `web/src/pages/login/`: Login page
 - `web/src/pages/404/`: 404 error page
 
-## Frontend Data Flow
-
 ### Main Data Flow
 
 1. **User Login Process**:

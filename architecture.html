@@ -286,45 +286,33 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
     
     <div class="note" style="background-color: #e6f7ff; border-left-color: #0080FF;">
         <h3>TIPS</h3>
-        <p>We recommend assigning a dedicated worker for each end user to better recognize and translate conversations. <strong style="background-color: #ffeb3b; padding: 2px 4px;">Each worker should only recognize one language</strong>. You can configure this using the following field:</p>
-        <pre style="background-color: #f8f9fa; border-left: 3px solid #0080FF;">
-"uidLanguagesConfig": [                        // Optional: Configure specific languages for individual users
-     {
-        "uid": "&lt;YouSpecifyUid&gt;",              // User ID to configure language for
-        "languages": ["&lt;YourTranscribeLanguages&gt;"] // Languages to use for this specific user
-     }
-  ]</pre>
-    
-        <p>Here's a complete example of an actual request:</p>
+        <p>We recommend assigning a dedicated worker for each end user to better recognize and translate conversations. <strong style="background-color: #ffeb3b; padding: 2px 4px;">Each worker should only recognize one language.</strong></p>
+        <p style="color: #d32f2f;"><strong>Note:</strong> In multi-language scenarios, it is recommended <strong>not</strong> to use <code>uidLanguagesConfig</code>. Instead, please consider creating a separate worker for each user to ensure optimal recognition and translation quality.</p>
+        <p>Here is an example of a real request:</p>
         <pre style="background-color: #f8f9fa; border-left: 3px solid #0080FF;">
 {
-  "name": "**",
-  "languages": ["en-US"],
-  "maxIdleTime": 30,
-  "rtcConfig": {
-    "channelName": "22",
-    "subBotUid": "*",
-    "pubBotUid": "****",
-    "subscribeAudioUids": ["144757"],
-    "subBotToken": "*****",
-    "pubBotToken": "*****"
+  "name": "**",                                 // Task name for identification
+  "languages": ["en-US"],                       // Array of language codes for transcription
+  "maxIdleTime": 30,                            // Maximum idle time in seconds before auto-termination
+  "rtcConfig": {                                // RTC configuration settings
+    "channelName": "22",                        // Name of the RTC channel to join
+    "subBotUid": "*",                           // UID for the bot that subscribes to audio
+    "pubBotUid": "****",                        // UID for the bot that publishes captions
+    "subscribeAudioUids": ["144757"],           // Specific UIDs to subscribe to
+    "subBotToken": "*****",                     // Token for the subscribing bot (optional)
+    "pubBotToken": "*****"                      // Token for the publishing bot (optional)
   },
-  <strong style="background-color: #ffeb3b; display: inline-block; width: 100%;">"uidLanguagesConfig": [
-    {
-      "uid": "*",
-      "languages": ["en-US"]
-    }
-  ],</strong>
-  "translateConfig": {
+  "translateConfig": {                          // Configuration for translation service
     "languages": [
       {
-        "source": "en-US",
-        "target": ["zh-CN"]
+        "source": "en-US",                      // Source language code
+        "target": ["zh-CN"]                     // Array of target language codes
       }
     ]
   }
-}</pre>
-        <p>In this example, we've configured a dedicated worker to recognize English (en-US) for a specific user, and translate it to Chinese (zh-CN).</p>
+}
+        </pre>
+        <p>As shown above, creating a dedicated worker for each user ensures the best recognition and translation experience in multi-language environments.</p>
     </div>
     
     <h2>Important Notes</h2>
