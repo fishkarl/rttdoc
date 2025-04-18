@@ -57,6 +57,34 @@
             background-color: #f9f9f9;
             border-radius: 5px;
         }
+        /* 新增API分块样式 */
+        .api-block {
+            margin-bottom: 32px;
+            padding: 20px;
+            background-color: #f5faff;
+            border: 1px solid #e6f7ff;
+            border-radius: 8px;
+        }
+        /* 新增API URL高亮样式 */
+        .api-url {
+            background-color: #e6f7ff;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #0066cc;
+            display: inline-block;
+            margin: 8px 0 16px 0;
+        }
+        /* 递进色的pre样式 */
+        .api-block pre {
+            background-color: #eaf4fb;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+        }
         .system-diagram {
             text-align: center;
             margin: 25px 0;
@@ -80,7 +108,7 @@
     <p>This document describes how to implement real-time voice translation functionality based on the Agora SDK. This feature allows users speaking different languages to communicate without barriers, as the system automatically detects the user's language and translates voice content into the target language displayed as subtitles.</p>
     
     <div class="system-diagram">
-        <img src="https://kroki.io/mermaid/svg/eNq9VE1v2zAMvedX8NgCNXbPIUCRoluBZhhid3dVZhxusuRJVILu14-aP2K7Sbte5ptsvke-x2cF_BXRarwjVXlVLxrlmTQ1yjLcNs3kfIe1gxz9Af3k_bZYz86byfm7I41w-7CQ56tjBCcMif2m_7KEB0tMytBvxeQsfPNOYwgLKcpWq1HjJWzTxIGhcD_RwtWReA-RyuvFqCoTkEBTMUdv29p5cxlzCY-uonk70dN_YJfUwVUMZKuW5hrQqmeDENijqrNagKpCqJ1IcF7qBprNhGYzpbnsxaOyVUyUOTILIICyJeQvVu-9NGktWgjhIPMzMniRL3wxCF9w0QuZ6YhuoMQyNoa0kopEFgSgAhinlQFWvpJzX33O9LWzO6qixw7S1yai04idMXlRyHt_ED2TpaxWJ433zh-VL_-dqIdm89FyGZ9jAyHqtMNdNGeTcKZstKaTuZcVdktsDWZx8vIG8_jMxKKgC1ba-r1xx3PW5iiCZysYmn7cvzf-sW2bkKckQOzgGGC9FzzCFzHdpOSOQ7UdBeqHI_sptBjdYqxj2qVE_fcwPjVlgn7Ysw43AHQX6lbCxYB1sHfy9brqjT0okzHVCIVXNpj2yhvyMdxAFBj_3h3Tm0bMXo-WpJEOry6jZGtJoTHqRUZqwxj-AHS3ER8" alt="Agora Real-time Translation Flow Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
+        <img src="https://kroki.io/mermaid/svg/eNq9VMuO2jAU3ecr7hKkibpngYQYtaUaKgRM98a5hNtx7IwfoJmv73XiQMJjlmWFk3uOfR6xw_eAWuIzidKKKquF9SSpFtrDrK4H62esDGzQHtEOnq-386v1crD-Y0gizBZZ_P02HsEwRaR_6l5NYKHJk1D0KTwZDStrJDqX8VA-nfZ2nsA6Htl52Jo31DA6kT9AoGKc9aZyBjE0DvtgdTt7vTmfcwIvpqTr7VhQ98KbKA9GwZEuW5oxoBY7heC8RVHlFQNFiVAZlmAsz51plgOa5ZDmsRcvQpchUm4-tDxY5k2uCF3ArET2dOPZ4FBnzHrW-gM9WPaASYNjUmeCZUaV2J6gwCLUiqTgiUjlGCAcKCOFAiYsed1N33P-l2Eps9UCRtLoPZXBYgJ3qEjpWaJr-JNPm-2Wn9sjyxuGNJ1eNF-498aehC1uOcdZN55fn6yxA07GvrFuNtuFnZOWdhgXrAREKMikxPpn81Zopxp37_Yn-cyEMhZkH1Q_3Es-j41I0beJeLb-ce7rNrzXOMob--BgfmBChJ98ZBWb1c973cv6L9v3zbUY2WK08bSPYUdt_7Unr3URoU2a6f8Vqpfpo0LcITmju_o12r6oRcKlXtxms7emgtrikQz7Jpovy6XE63Ql3GtF4u2V4otMhco9VQjbS9XguzKnxrnzbUPOY3NPDG-VgbZmchXcoV9bjtIF5d0ttimCRpWfqEBuwLzXHIl0vLnBYtYFuVqJj_gFefIK3T_J_iPF" alt="Agora Real-time Translation Flow Diagram" style="width: 100%; max-width: 1000px; margin: 20px 0;">
         <p class="diagram-caption">Figure 1: Agora Real-time Translation System Flow Diagram</p>
     </div>
 
@@ -198,33 +226,132 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
     
     <h3>Initialization and Authentication</h3>
     <div class="api-section">
-        <h4>Request Token API</h4>
-        <ul>
-            <li><strong>Function</strong>: Obtain tokens for RTC and RTM connections</li>
-            <li><strong>Parameters</strong>: User ID (uid)</li>
-            <li><strong>Returns</strong>: Authorization token</li>
-        </ul>
-    </div>
-    
-    <h3>Agent Related Interfaces</h3>
-    <div class="api-section">
-        <h4>Join API</h4>
-        <ul>
-            <li><strong>Function</strong>: Forward language settings to translation agent</li>
-            <li><strong>Parameters</strong>: Language configuration information</li>
-        </ul>
-        
-        <h4>Update API</h4>
-        <ul>
-            <li><strong>Function</strong>: Update language configuration</li>
-            <li><strong>Parameters</strong>: Updated language configuration</li>
-        </ul>
-        
-        <h4>Leave API</h4>
-        <ul>
-            <li><strong>Function</strong>: Let worker leave channel and stop transcription and translation</li>
-            <li><strong>Parameters</strong>: None</li>
-        </ul>
+
+        <div class="api-block">
+            <h4>Request Token API</h4>
+            <div class="api-url">/api/token</div>
+            <ul>
+                <li><strong>Function</strong>: Obtain tokens for RTC and RTM connections</li>
+                <li><strong>Parameters</strong>: User ID (uid)</li>
+                <li><strong>Returns</strong>: Authorization token</li>
+            </ul>
+            <p style="color: #d32f2f;"><strong>Note:</strong> For production environments, it is strongly recommended to deploy your own token distribution server to ensure security.</p>
+            <pre>
+Request Example:
+{
+  "appId": "******",         // Application id
+  "channelName": "*****",    // Channel name
+  "expire": 7200,            // Token expiration time (seconds)
+  "src": "web",              // Source platform
+  "types": [1, 2],           // Token type, e.g. [1] for RTC, [1,2] for RTC/RTM
+  "uid": "******"            // User ID
+}
+Response Example:
+{
+  "token": "Authorization token"
+}
+            </pre>
+        </div>
+
+        <div class="api-block">
+            <h4>Join API</h4>
+            <div class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/join</div>
+            <ul>
+                <li><strong>Function</strong>: Forward language settings to translation agent</li>
+                <li><strong>Parameters</strong>: Language configuration information</li>
+            </ul>
+            <pre>
+Request Example:
+{
+  "name": "**",                                 // Task name for identification
+  "languages": ["en-US"],                       // Array of language codes for transcription
+  "maxIdleTime": 30,                            // Maximum idle time in seconds before auto-termination
+  "rtcConfig": {                                // RTC configuration settings
+    "channelName": "22",                        // Name of the RTC channel to join
+    "subBotUid": "*",                           // UID for the bot that subscribes to audio
+    "pubBotUid": "****",                        // UID for the bot that publishes captions
+    "subscribeAudioUids": ["******"],           // Specific UIDs to subscribe to
+    "subBotToken": "*****",                     // Token for the subscribing bot (optional)
+    "pubBotToken": "*****"                      // Token for the publishing bot (optional)
+  },
+  "translateConfig": {                          // Configuration for translation service
+    "languages": [
+      {
+        "source": "en-US",                      // Source language code
+        "target": ["zh-CN"]                     // Array of target language codes
+      }
+    ]
+  }
+}
+Response Example:
+{
+  "agent_id": "*******",
+  "create_ts": 1744968395,
+  "status": "RUNNING"
+}
+            </pre>
+        </div>
+
+        <div class="api-block">
+            <h4>Update API</h4>
+            <div class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/update</div>
+            <ul>
+                <li><strong>Function</strong>: Update language configuration</li>
+                <li><strong>Parameters</strong>: Updated language configuration</li>
+            </ul>
+            <pre>
+Request Example:
+{
+  "languages": [                                 // Update the transcription languages
+    "en-US"
+  ],
+  "uidLanguagesConfig": [                        // Update language settings for specific users
+    {
+      "uid": "<YouSpecifyUid>",                  // User ID to update settings for
+      "languages": ["en-US"]                     // New languages for this user
+    }
+  ],
+  "rtcConfig": {                                 // Update RTC configuration
+    "subscribeAudioUids": ["123"]                // New list of UIDs to subscribe to
+  },
+  "translateConfig": {                           // Update translation settings
+    "enable": true,                              // Enable/disable translation
+    "languages": [
+      {
+        "source": "en-US",                       // Source language code
+        "target": ["zh-CN"]                      // Target language codes
+      }
+    ]
+  }
+}
+Response Example:
+{
+  "agent_id": "*******",
+  "create_ts": 1744968395,
+  "status": "RUNNING"
+}
+            </pre>
+        </div>
+
+        <div class="api-block">
+            <h4>Leave API</h4>
+            <div class="api-url">https://api.agora.io/api/speech-to-text/v1/projects/{appid}/leave</div>
+            <ul>
+                <li><strong>Function</strong>: Let worker leave channel and stop transcription and translation</li>
+                <li><strong>Parameters</strong>: None</li>
+            </ul>
+            <pre>
+Request Example:
+{}
+Response Example:
+{
+  "agent_id": "*******",
+  "create_ts": 1744968395,
+  "status": "STOPPED"
+}
+            </pre>
+        </div>
+
     </div>
     
     <h2>Implementation Steps</h2>
@@ -286,7 +413,7 @@ Agent → User Client: Receive stream messages and display subtitles</pre>
     
     <div class="note" style="background-color: #e6f7ff; border-left-color: #0080FF;">
         <h3>TIPS</h3>
-        <p>We recommend assigning a dedicated worker for each end user to better recognize and translate conversations. <strong style="background-color: #ffeb3b; padding: 2px 4px;">Each worker should only recognize one language.</strong></p>
+        <p>For optimal recognition and translation accuracy, we recommend assigning a dedicated worker to each end user. <strong style="background-color: #ffeb3b; padding: 2px 4px;">Each worker should be set up to recognize only a single language.</strong></p>
         <p style="color: #d32f2f;"><strong>Note:</strong> In multi-language scenarios, it is recommended <strong>not</strong> to use <code>uidLanguagesConfig</code>. Instead, please consider creating a separate worker for each user to ensure optimal recognition and translation quality.</p>
         <p>Here is an example of a real request:</p>
         <pre style="background-color: #f8f9fa; border-left: 3px solid #0080FF;">
