@@ -87,50 +87,7 @@
         
         <p>When users and agents interact in an RTC channel, each speech generates corresponding subtitle content and goes through the following process to be rendered on the client side:</p>
         
-        <div class="mermaid">
-flowchart TD
-    A[User/Agent Speech] --> B[Audio Data Collection]
-    B --> C[Get PTS Timestamp]
-    
-    subgraph "Subtitle Generation Flow"
-        D[Generate Subtitle JSON Data] --> E[Base64 Encoding]
-        E --> F{Data Size > 1K?}
-        F -->|Yes| G[Packet Splitting]
-        F -->|No| H[Direct Publishing]
-        G --> H[Publish Data Stream]
-    end
-    
-    H --> I[Receive Data Stream]
-    I --> J[Parse Subtitle Data]
-    
-    subgraph "Subtitle Parsing Process"
-        J --> K{Message Type?}
-        K -->|user.transcription| L[User Message Processing]
-        K -->|assistant.transcription| M[Agent Message Processing]
-        K -->|message.interrupt| N[Interrupt Message Processing]
-
-        L --> L1[User Subtitle Message] --> P[UI Callback Display]
-        
-        M --> O{Render Mode?}
-        O -->|Text Mode| P[UI Callback Display]
-        O -->|Word Mode| Q[Add to Processing Queue]
-        
-        N --> R[Mark Interrupt Status]
-        R --> Q
-    end
-    
-    subgraph "Subtitle Rendering Flow"
-        Q --> S[Timer Loop Retrieval]
-        S --> T[Filter Displayable Messages]
-        T --> U[Process Interrupt Status]
-        U --> V[Select Latest Turn for Rendering]
-        V --> W[Generate Subtitle Message]
-        W --> X[UI Callback Display]
-        X --> Y{Is Finished?}
-        Y -->|Yes| Z[Clear Queue]
-        Y -->|No| S
-    end
-        </div>
+        <img src="images/real_time_subtitle_gen_flow.png" alt="Real-time Subtitle Generation Flow" style="max-width: 100%; height: auto; display: block; margin: 20px auto;">
         
         <div id="content"></div>
     </div>
