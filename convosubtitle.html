@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Subtitles Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #7f8c8d;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: #ecf0f1;
+            padding: 0;
+        }
+        ul, ol {
+            margin-left: 20px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .mermaid {
+            text-align: center;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin-left: 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Real-time Subtitles</h1>
+        
+        <p>When interacting with conversational agents in real-time, you may need real-time subtitles to display your conversation content with the agent. This article introduces how to implement real-time subtitle functionality in your App. The code logic is demonstrated with Android, but the logic is the same for other platforms - please refer to the relevant SDK APIs based on the logic.</p>
+        
+        <h2>Technical Principles</h2>
+        
+        <p>When users and agents interact in an RTC channel, each speech generates corresponding subtitle content and goes through the following process to be rendered on the client side:</p>
+        
+        <div class="mermaid">
+flowchart TD
+    A[User/Agent Speech] --> B[Audio Data Collection]
+    B --> C[Get PTS Timestamp]
+    
+    subgraph "Subtitle Generation Flow"
+        D[Generate Subtitle JSON Data] --> E[Base64 Encoding]
+        E --> F{Data Size > 1K?}
+        F -->|Yes| G[Packet Splitting]
+        F -->|No| H[Direct Publishing]
+        G --> H[Publish Data Stream]
+    end
+    
+    H --> I[Receive Data Stream]
+    I --> J[Parse Subtitle Data]
+    
+    subgraph "Subtitle Parsing Process"
+        J --> K{Message Type?}
+        K -->|user.transcription| L[User Message Processing]
+        K -->|assistant.transcription| M[Agent Message Processing]
+        K -->|message.interrupt| N[Interrupt Message Processing]
+
+        L --> L1[User Subtitle Message] --> P[UI Callback Display]
+        
+        M --> O{Render Mode?}
+        O -->|Text Mode| P[UI Callback Display]
+        O -->|Word Mode| Q[Add to Processing Queue]
+        
+        N --> R[Mark Interrupt Status]
+        R --> Q
+    end
+    
+    subgraph "Subtitle Rendering Flow"
+        Q --> S[Timer Loop Retrieval]
+        S --> T[Filter Displayable Messages]
+        T --> U[Process Interrupt Status]
+        U --> V[Select Latest Turn for Rendering]
+        V --> W[Generate Subtitle Message]
+        W --> X[UI Callback Display]
+        X --> Y{Is Finished?}
+        Y -->|Yes| Z[Clear Queue]
+        Y -->|No| S
+    end
+        </div>
+        
+        <div id="content"></div>
+    </div>
+    
+    <script>
+        // Initialize Mermaid first
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+        
+        const markdownContent = `### 1. **Get PTS**: 
+Register audio data observer and set audio observation position
+- Android API: ['getObservedAudioFramePosition'](https://api-ref.agora.io/en/video-sdk/android/4.x/API/class_iaudioframeobserver.html#ariaid-title11)
+- [Android Register Audio Observer](https://github.com/Shengwang-Community/Conversational-AI-Demo/blob/main/Android/scenes/convoai/src/main/java/io/agora/scene/convoai/convoaiApi/subRender/v3/TranscriptionController.kt#L258)
+
+### 2. **Generate Subtitles**:
+The interaction content between agents and users automatically generates [subtitle raw content](#subtitle-json-field-description) in JSON format.
+
+### 3. **Encoding**: Base64 encode the subtitle raw content for transmission.
+
+### 4. **Packet Splitting**: Encoded data exceeding 1k in size will be automatically split according to [specific rules](#parse-subtitles).
+ - Parse Subtitles: Before data packet publishing, packets exceeding 1k in size will be encoded as follows: \`{message_id}|{id}|{total}|{chunked_data}\`. Field descriptions:
+
+    - \`message_id\`: Unique identifier for each subtitle message.
+    - \`id\`: Packet sequence number, starting from \`1\`.
+    - \`total\`: Total number of packets.
+    - \`chunked_data\`: Base64 encoded segmented data.
+
+    Assuming 5 packets:
+\`\`\`plaintext
+abcdefgh|1|5|ewoJImlzX2Zpb...
+abcdefgh|2|5|ZWF2aW5nI...
+abcdefgh|3|5|BoZWFydCByYW...
+abcdefgh|4|5|G8ga25vdyBt...
+abcdefgh|5|5|d24gcGF0aHMgY...
+\`\`\`
+
+You need to verify whether packets belong to the same message after unpacking, merge the segmented packets, then parse the data packets to obtain the original subtitle content.
+
+[Android Segmented Packet Merging and Parsing Reference](https://github.com/Shengwang-Community/Conversational-AI-Demo/blob/main/Android/scenes/convoai/src/main/java/io/agora/scene/convoai/convoaiApi/subRender/v3/MessageParser.kt)
+
+### 5. **Publish Data Stream**: Create a data stream for each data packet and publish it to the RTC channel.
+
+### 6. **Receive Data Stream**: Receive encoded data through the data stream message callback provided by the SDK.
+- [Android \`onStreamMessage\`](https://api-ref.agora.io/en/video-sdk/android/4.x/API/class_irtcengineeventhandler.html#callback_irtcengineeventhandler_onstreammessage)
+
+### 7. **Parse Subtitles**: Unpack, verify, and merge the received data stream to parse out complete subtitle content.
+
+[Android Parse Subtitles Reference](https://github.com/Shengwang-Community/Conversational-AI-Demo/blob/main/Android/scenes/convoai/src/main/java/io/agora/scene/convoai/convoaiApi/subRender/v3/MessageParser.kt)
+
+There are three message types [Subtitle JSON Field Description](#subtitle-json-field-description)
+- assistant.transcription: Agent message
+- user.transcription: User message
+- message.interrupt: Agent interrupt message
+
+Message Processing Logic: [Android Message Parsing Processing Reference](https://github.com/Shengwang-Community/Conversational-AI-Demo/blob/main/Android/scenes/convoai/src/main/java/io/agora/scene/convoai/convoaiApi/subRender/v3/TranscriptionController.kt#L392-L405)
+
+The \`onAgentMessageReceived\` method processes received agent messages, supports two subtitle rendering modes (text mode and word mode), and manages the complete message flow, including interrupt and update processing.
+
+#### Automatic Render Mode Detection
+- If render mode is not set (\`mRenderMode == null\`), the system will auto-detect
+- If configuration requires word mode and word data is received, use word mode
+- Otherwise default to text mode
+
+#### Text Mode Processing
+- When render mode is text and message is not interrupted, directly create \`SubtitleMessage\` object
+- Set subtitle status based on message status (in progress/finished)
+- Pass message to listener through callback
+
+#### Word Mode Processing
+- Message processing logic includes:
+  - Discard outdated messages (earlier than the latest message in queue or already processed messages)
+  - Merge message data with the same turnId
+
+#### Interrupt Processing
+- When interrupt status is received, mark all words after startMs timestamp as interrupted
+- Also mark the last word before startMs as interrupted
+
+#### Message Merging
+- Merge existing and new word lists, avoiding timestamp duplicates (due to duplicate messages from multiple sends)
+- Sort all words by timestamp
+- If there's an interrupt mark, mark all words after interruption as interrupted
+- If it's an end message, mark the last word as ended
+
+### 8. **Render Subtitles**: The App displays the parsed subtitle content on the user interface. This section introduces how to render subtitles in Word mode in real-time.
+- [Android Subtitle Rendering Reference](https://github.com/Shengwang-Community/Conversational-AI-Demo/blob/main/Android/scenes/convoai/src/main/java/io/agora/scene/convoai/convoaiApi/subRender/v3/TranscriptionController.kt#L625-L731)
+
+- Only executes when current pts is valid (\`mPresentationMs > 0\`) and in word mode (\`SubtitleRenderMode.Word\`). (mPresentationMs is obtained through RTC interface callback, refer to **Get PTS**)
+
+#### Displayable Message Filtering
+- Filter turn messages in queue that meet display conditions:
+  - Check interrupt conditions: if interrupted word exists and timestamp is less than current pts
+  - Filter out words with timestamp less than current pts
+  - Create (turn, words) objects for qualifying turns
+
+#### Interrupt Processing
+- When interrupt condition is detected:
+  1. Collect all words before interrupt timestamp
+  2. Generate interrupted subtitle text
+  3. Create \`SubtitleMessage\` with interrupt status
+  4. Send to UI through callback
+  5. Remove the turn from queue
+  6. Clear current subtitle message reference
+
+#### Latest Turn Rendering
+- Select the last valid turn as target display content
+- Determine if it's in end status (last word status is \`SubtitleStatus.End\`)
+
+#### Previous Turn Interruption
+- When multiple valid turns exist, interrupt all turns except the last one:
+  1. Create interrupt status message for each previous turn
+  2. Send to UI through callback
+  3. Remove interrupted turns from queue
+  4. Mark interrupted turn as last removed turn
+
+#### Subtitle Message Generation
+- Create new subtitle message \`SubtitleMessage\`:
+  - If in end status, use turn's complete text
+  - Otherwise, concatenate text of displayed words
+  - Set as ended or in progress based on status
+
+#### Queue Management
+- If current turn ends:
+  1. Update last removed turn reference
+  2. Remove the turn from queue
+  3. Clear current subtitle message reference
+- Otherwise, update current subtitle message reference
+
+#### Data Structures and State Management
+- \`TurnMessageInfo\`: Original message parsed from subtitles, containing turnId, startMs, text, word, etc.
+- \`SubtitleMessage\`: Subtitle information provided to UI, assembled from TurnMessageInfo for UI layer use
+- \`TurnWordInfo\`: Word-level information
+- \`TurnStatus\`: Mark message status (in progress/ended/interrupted)
+- \`SubtitleStatus\`: Mark subtitle status (in progress/ended/interrupted)
+
+## Subtitle JSON Field Description
+
+Example subtitle JSON:
+
+\`\`\`json
+// User message
+{
+    "object": "user.transcription", // Confirms user message
+    "turn_id": 2, // Which round of conversation
+    "final": true, // Whether ASR is finished
+    "stream_id": 0,
+    "message_id": "abcdefgh",
+    "user_id": 0,
+    "start_ms": 1111111111,
+    "text": "Tell me a story."
+}
+
+// Agent message
+{
+    "object": "assistant.transcription", // Confirms agent message
+    "turn_id": 2, // Which round of conversation
+    "turn_status": 1, // 0: progress 1: end, 2: interrupt
+    "stream_id": 0,
+    "message_id": "abcdefgh",
+    "data_type": "transcribe",
+    "start_ms": 1111111111,
+    "text": "Sure!",
+    "words": [
+        {
+            "word": "Sure",
+            "start_ms": 1746969805235
+        },
+        {
+            "word": "!",
+            "start_ms": 1746969805398
+        }
+    ]
+}
+
+// Agent interrupt message
+{
+    "object": "message.interrupt", // Confirms agent interrupt message
+    "turn_id": 2,
+    "start_ms": 1111111111
+}
+\`\`\`
+
+Field descriptions:
+- \`object\`: String type, indicates message category. user.transcription is human voice ASR, i.e., user message; assistant.transcription is agent message; message.interrupt is agent interrupt message.
+- \`final\`: Boolean type, indicates whether the text will still change, i.e., human voice ASR result.
+- \`stream_id\`: Int type, user ID corresponding to the subtitle. Agent identifier is 0, non-zero is the corresponding user's int uid.
+- \`turn_id\`: Int type, a round of conversation corresponding to the subtitle. User question ASR result and agent response message have the same turn_id.
+- \`turn_status\`: Int type, agent subtitle status. 0 agent is outputting, 1 agent message end flag, 2 agent interrupt, also considered as end of a sentence
+- \`message_id\`: String type, unique identifier for each subtitle message.
+- \`data_type\`: String type, data type, default is \`transcribe\`.
+- \`start_ms\`: Long type, timestamp when subtitle was generated.
+- \`text\`: String type, subtitle content.
+- \`words\`: JsonArray, in word mode, start time for each word`;
+
+        document.getElementById('content').innerHTML = marked.parse(markdownContent);
+    </script>
+</body>
+</html>
